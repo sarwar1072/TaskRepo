@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProjectAuthoAPI", "TestProjectAutho.API\TestProjectAuthoAPI.csproj", "{6F613554-E3C0-46A2-880B-16AC287E74BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Membership", "Membership\Membership.csproj", "{98BDE87F-2FB8-4DC3-9E44-EE00CC9CDD72}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F613554-E3C0-46A2-880B-16AC287E74BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F613554-E3C0-46A2-880B-16AC287E74BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F613554-E3C0-46A2-880B-16AC287E74BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F613554-E3C0-46A2-880B-16AC287E74BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98BDE87F-2FB8-4DC3-9E44-EE00CC9CDD72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98BDE87F-2FB8-4DC3-9E44-EE00CC9CDD72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98BDE87F-2FB8-4DC3-9E44-EE00CC9CDD72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98BDE87F-2FB8-4DC3-9E44-EE00CC9CDD72}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E5624F4A-FE0E-466B-8875-7FCF36141A44}
+	EndGlobalSection
+EndGlobal
