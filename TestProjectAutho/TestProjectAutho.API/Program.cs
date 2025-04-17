@@ -40,12 +40,7 @@ namespace TestProjectAuthoAPI
             //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
-            builder.Services.AddControllers();
-
-            //Add Identity
-            //builder.Services.AddIdentity<AppUser, IdentityRole>()
-            //    .AddEntityFrameworkStores<AppDbContext>()
-            //    .AddDefaultTokenProviders();
+            builder.Services.AddControllers();           
 
             builder.Services
                 .AddIdentity<ApplicationUser, Role>()
@@ -78,6 +73,15 @@ namespace TestProjectAuthoAPI
                     };
 
                 });
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSites", policy =>
+                {
+                    policy.WithOrigins("https://localhost:44335") // Blazor client URL
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -93,7 +97,8 @@ namespace TestProjectAuthoAPI
             }
 
             app.UseHttpsRedirection();
-            app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            // app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            app.UseCors("AllowSites"); // <- ADD THIS
 
             app.UseAuthentication();
             app.UseAuthorization();

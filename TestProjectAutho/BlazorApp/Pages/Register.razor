@@ -1,0 +1,21 @@
+﻿@page "/register"
+@inject IAuthService AuthService
+
+<h3>Register</h3>
+
+<EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+    <InputText @bind-Value="registerModel.FullName" placeholder="Full Name" />
+    <InputText @bind-Value="registerModel.EmailAddress" placeholder="Email" />
+    <InputText @bind-Value="registerModel.PassWord" type="password" placeholder="Password" />
+    <button type="submit">Register</button>
+</EditForm>
+
+@code {
+    RegisterVM registerModel = new();
+
+    async Task HandleRegister()
+    {
+        var result = await AuthService.Register(registerModel);
+        Console.WriteLine(result);
+    }
+}
