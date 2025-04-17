@@ -19,16 +19,15 @@
     {
         var result = await AuthService.Register(registerModel);
 
-        if (!string.IsNullOrEmpty(result)) // Assuming result is success message or token
+        if (!string.IsNullOrEmpty(result)) 
         {
-            // Automatically login after registration
             loginModel.EmailAddress = registerModel.EmailAddress;
             loginModel.PassWord = registerModel.PassWord;
 
             var loginResult = await AuthService.Login(loginModel);
             if (loginResult)
             {
-                Nav.NavigateTo("/"); // Triggers MainLayout which shows username
+                Nav.NavigateTo("/"); 
             }
         }
         else

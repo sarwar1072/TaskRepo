@@ -98,7 +98,9 @@ namespace TestProjectAuthoAPI.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null) return NotFound();
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            //var shortToken = new Random().Next(100000, 999999).ToString();
+
             return Ok(new { Token = token }); 
         }
 
