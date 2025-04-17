@@ -85,7 +85,9 @@ namespace TestProjectAuthoAPI.Controllers
             if (userExists != null && await _userManager.CheckPasswordAsync(userExists, loginVM.PassWord))
             {
                 var tokenValue = await GenerateJWTTokenAsync(userExists);
-                return Ok(tokenValue);
+                //return Ok(tokenValue);
+                return Ok(new { token = tokenValue }); // ✅ Make sure it's wrapped like this
+
             }
             return Unauthorized();
         }

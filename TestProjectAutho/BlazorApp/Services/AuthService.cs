@@ -25,20 +25,40 @@ namespace BlazorApp.Services
             var response = await _http.PostAsJsonAsync("api/Auth/register", model);
             return await response.Content.ReadAsStringAsync();
         }
-
         public async Task<string> Login(LoginVM model)
         {
-            var response = await _http.PostAsJsonAsync("api/Auth/login", model);
-            var token = await response.Content.ReadAsStringAsync();
-
+            var response = await _http.PostAsJsonAsync("api/auth/login", model);
             if (response.IsSuccessStatusCode)
             {
+                var result = await response.Content.ReadFromJsonAsync<TokenResponse>();
+                var token = result.token.token; // Nested property
+
                 await _localStorage.SetItemAsync("authToken", token);
                 ((JwtAuthStateProvider)_authProvider).NotifyUserAuthentication(token);
                 _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                return token;
             }
 
-            return token;
+            return null!;
+        }
+        public async Task<string?> ForgotPassword(ForgotPasswordModel model)
+        {
+            var response = await _http.PostAsJsonAsync("api/auth/forgot-password", model);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                return result?["token"]; // In production, you'd email this
+            }
+
+            return null;
+        }
+
+        public async Task<bool> ResetPassword(ResetPasswordModel model)
+        {
+            var response = await _http.PostAsJsonAsync("api/auth/reset-password", model);
+            return response.IsSuccessStatusCode;
         }
 
         public async Task Logout()
