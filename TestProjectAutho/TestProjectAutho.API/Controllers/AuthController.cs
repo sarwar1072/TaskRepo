@@ -120,15 +120,6 @@ namespace TestProjectAuthoAPI.Controllers
             return result.Succeeded ? Ok("Password changed") : BadRequest(result.Errors);
         }
 
-        //[Authorize(Roles = "Admin")]
-        //[HttpGet("wish")]
-        //[ProducesResponseType(StatusCodes.Status403Forbidden)]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public IActionResult Wish()
-        //{
-        //    return Ok("User Created");
-        //}
         private async Task<AuthResultVM> GenerateJWTTokenAsync(ApplicationUser user)
         {
             var tokenObj = await _tokenService.GetJwtTokenAsync(user);

@@ -4,6 +4,7 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Reflection;
 
 namespace BlazorApp.Services
 {
@@ -25,7 +26,8 @@ namespace BlazorApp.Services
             var response = await _http.PostAsJsonAsync("api/Auth/register", model);
             return await response.Content.ReadAsStringAsync();
         }
-        public async Task<string> Login(LoginVM model)
+      
+        public async Task<bool> Login(LoginVM model)
         {
             var response = await _http.PostAsJsonAsync("api/auth/login", model);
             if (response.IsSuccessStatusCode)
@@ -37,11 +39,25 @@ namespace BlazorApp.Services
                 ((JwtAuthStateProvider)_authProvider).NotifyUserAuthentication(token);
                 _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                return token;
+                return true;
             }
 
-            return null!;
+            return false;
         }
+
+        public async Task<string?> ChangePassword(ChangePasswordModel model)
+        {
+            var response = await _http.PostAsJsonAsync("api/auth/change-password", model);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync(); // "Password changed"
+            }
+
+            var error = await response.Content.ReadAsStringAsync();
+            return $"Failed: {error}";
+        }
+
         public async Task<string?> ForgotPassword(ForgotPasswordModel model)
         {
             var response = await _http.PostAsJsonAsync("api/auth/forgot-password", model);

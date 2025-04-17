@@ -1,12 +1,30 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject IAuthService AuthService
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
 
     <main>
-        <div class="top-row px-4">
+        <div class="top-row px-4 d-flex justify-content-between align-items-center">
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+
+            <div>
+                @if (isAuthenticated)
+                {
+                    <span class="me-3">Hello, @userName</span>
+                    <button class="btn btn-sm btn-outline-danger" @onclick="Logout">Logout</button>
+                }
+                else
+                {
+                    <a class="btn btn-sm btn-outline-primary me-2" href="login">Login</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="register">Register</a>
+                }
+            </div>
         </div>
 
         <article class="content px-4">
@@ -14,3 +32,40 @@
         </article>
     </main>
 </div>
+
+@code {
+    private bool isAuthenticated;
+    private string userName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
+        await SetUserInfo();
+    }
+
+    private async Task SetUserInfo()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+        userName = isAuthenticated ? user.Identity?.Name ?? "" : "";
+        StateHasChanged();
+    }
+
+    private void OnAuthStateChanged(Task<AuthenticationState> task)
+    {
+        _ = SetUserInfo();
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        Navigation.NavigateTo("login", forceLoad: true);
+    }
+
+    public void Dispose()
+    {
+        AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
+    }
+}

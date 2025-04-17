@@ -1,5 +1,6 @@
 ﻿@page "/register"
 @inject IAuthService AuthService
+@inject NavigationManager Nav
 
 <h3>Register</h3>
 
@@ -12,10 +13,27 @@
 
 @code {
     RegisterVM registerModel = new();
+    LoginVM loginModel = new();
 
     async Task HandleRegister()
     {
         var result = await AuthService.Register(registerModel);
-        Console.WriteLine(result);
+
+        if (!string.IsNullOrEmpty(result)) // Assuming result is success message or token
+        {
+            // Automatically login after registration
+            loginModel.EmailAddress = registerModel.EmailAddress;
+            loginModel.PassWord = registerModel.PassWord;
+
+            var loginResult = await AuthService.Login(loginModel);
+            if (loginResult)
+            {
+                Nav.NavigateTo("/"); // Triggers MainLayout which shows username
+            }
+        }
+        else
+        {
+            Console.WriteLine("Registration failed");
+        }
     }
 }
