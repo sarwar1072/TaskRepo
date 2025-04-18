@@ -4,11 +4,30 @@
 
 <h3>Register</h3>
 
+
 <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
-    <InputText @bind-Value="registerModel.FullName" placeholder="Full Name" />
-    <InputText @bind-Value="registerModel.EmailAddress" placeholder="Email" />
-    <InputText @bind-Value="registerModel.PassWord" type="password" placeholder="Password" />
-    <button type="submit">Register</button>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="fullName" class="form-label">Full Name</label>
+        <InputText id="fullName" class="form-control" @bind-Value="registerModel.FullName" placeholder="Enter your full name" />
+        <ValidationMessage For="@(() => registerModel.FullName)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="registerModel.EmailAddress" placeholder="Enter your email" />
+        <ValidationMessage For="@(() => registerModel.EmailAddress)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <InputText id="password" type="password" class="form-control" @bind-Value="registerModel.PassWord" placeholder="Enter a password" />
+        <ValidationMessage For="@(() => registerModel.PassWord)" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Register</button>
 </EditForm>
 
 @code {

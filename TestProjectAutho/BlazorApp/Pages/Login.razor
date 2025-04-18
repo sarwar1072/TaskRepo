@@ -4,10 +4,24 @@
 
 <h3>Login</h3>
 
+
 <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
-    <InputText @bind-Value="loginModel.EmailAddress" placeholder="Email" />
-    <InputText @bind-Value="loginModel.PassWord" type="password" placeholder="Password" />
-    <button type="submit">Login</button>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="loginModel.EmailAddress" placeholder="Enter your email" />
+        <ValidationMessage For="@(() => loginModel.EmailAddress)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.PassWord" placeholder="Enter your password" />
+        <ValidationMessage For="@(() => loginModel.PassWord)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
 </EditForm>
 
 @code {

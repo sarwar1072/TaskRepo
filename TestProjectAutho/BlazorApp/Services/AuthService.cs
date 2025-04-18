@@ -65,7 +65,7 @@ namespace BlazorApp.Services
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-                return result?["token"]; // In production, you'd email this
+                return result?["token"]; 
             }
 
             return null;
