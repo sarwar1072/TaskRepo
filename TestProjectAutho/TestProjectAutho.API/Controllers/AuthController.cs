@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using TestProjectAuthoAPI.Helper;
 using TestProjectAuthoAPI.Models;
+using TestProjectAuthoAPI.MService;
 
 namespace TestProjectAuthoAPI.Controllers
 {
@@ -19,13 +21,15 @@ namespace TestProjectAuthoAPI.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly ITokenService _tokenService;
-
-        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<Role> roleManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService)
+        private readonly IEmailService _emailService;
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<Role> roleManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
+            _emailService = emailService;   
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterVM registerVm)
@@ -92,34 +96,69 @@ namespace TestProjectAuthoAPI.Controllers
             return Unauthorized();
         }
 
-        [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+        //[HttpPost("forgot-password")]
+        //public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(model.Email);
+        //    if (user == null) return NotFound();
+
+        //     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        //    return Ok(new { Token = token }); 
+        //}
+        //[HttpPost("reset-password")]
+        //public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(model.Email);
+        //    if (user == null) return NotFound();
+
+        //    var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+        //    return result.Succeeded ? Ok("Password reset") : BadRequest(result.Errors);
+        //} 
+        //[HttpPost("change-password")]
+        //public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+        //{
+        //    var user = await _userManager.FindByNameAsync(model.UserName);
+        //    var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+        //    return result.Succeeded ? Ok("Password changed") : BadRequest(result.Errors);
+        //}
+
+        [HttpPost("for-Pass")]
+        public async Task<IActionResult> forPass(ForgotPasswordRequest model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) return NotFound();
+            if (user == null)
+                return BadRequest("User not found.");
 
-             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            //var shortToken = new Random().Next(100000, 999999).ToString();
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            return Ok(new { Token = token }); 
+            //var encryptToken = EncryptionHelper.Encrypt(token);
+            var resetLink = Url.Action(nameof(ResPass),"Auth", new { token, email = model.Email }, Request.Scheme);
+
+            var emailBody = $"<h3>Reset your password</h3><p>Click the link below to reset your password:</p><a href='{resetLink}'>Reset Password</a>";
+
+            await _emailService.SendEmailAsync(model.Email, "Reset Password", emailBody);
+
+            return Ok("Password reset link has been sent to your email.");
         }
-
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        [HttpPost("res-Pass")]
+        public async Task<IActionResult> ResPass(ResetPasswordRequest model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) return NotFound();
+            if (user == null)
+                return BadRequest("User not found.");
+
+            //var decryptToken=EncryptionHelper.Decrypt(model.Token);
 
             var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
-            return result.Succeeded ? Ok("Password reset") : BadRequest(result.Errors);
-        }
-    
-        [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
-        {
-            var user = await _userManager.FindByNameAsync(model.UserName);
-            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-            return result.Succeeded ? Ok("Password changed") : BadRequest(result.Errors);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new { Errors = errors });
+            }
+
+            return Ok("Password has been reset successfully.");
         }
 
         private async Task<AuthResultVM> GenerateJWTTokenAsync(ApplicationUser user)

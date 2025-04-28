@@ -21,8 +21,6 @@ namespace TestProjectAuthoAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             var assemblyName = Assembly.GetExecutingAssembly().FullName;
 
@@ -97,8 +95,7 @@ namespace TestProjectAuthoAPI
             }
 
             app.UseHttpsRedirection();
-            // app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-            app.UseCors("AllowSites"); // <- ADD THIS
+            app.UseCors("AllowSites"); 
 
             app.UseAuthentication();
             app.UseAuthorization();

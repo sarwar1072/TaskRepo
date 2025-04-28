@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using TestProjectAuthoAPI.MService;
 
 namespace TestProjectAuthoAPI
 {
@@ -8,8 +9,9 @@ namespace TestProjectAuthoAPI
 		{
 			//builder.RegisterType<VocubResponseModel>().AsSelf();
 			//builder.RegisterType<CommonResponseModel>().AsSelf();
+			builder.RegisterType< EmailService >().As<IEmailService >().InstancePerLifetimeScope();
 
-			base.Load(builder);
+            base.Load(builder);
 		}
 
 	}
