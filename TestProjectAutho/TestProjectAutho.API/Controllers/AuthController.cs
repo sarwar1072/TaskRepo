@@ -172,6 +172,14 @@ namespace TestProjectAuthoAPI.Controllers
             };
             return response;
         }
+        private static string GenerateRandomToken(int length = 30)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
 
 
     }
