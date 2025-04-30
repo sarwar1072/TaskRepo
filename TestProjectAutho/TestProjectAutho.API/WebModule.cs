@@ -10,7 +10,7 @@ namespace TestProjectAuthoAPI
 			//builder.RegisterType<VocubResponseModel>().AsSelf();
 			//builder.RegisterType<CommonResponseModel>().AsSelf();
 			builder.RegisterType< EmailService >().As<IEmailService >().InstancePerLifetimeScope();
-
+			builder.RegisterType<OtpService>().As<IOtpService>().SingleInstance();
             base.Load(builder);
 		}
 

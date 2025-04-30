@@ -12,6 +12,7 @@ using Membership.Contexts;
 using Autofac.Core;
 using Membership.Entities;
 using Membership.Services;
+using TestProjectAuthoAPI.MService;
 
 namespace TestProjectAuthoAPI
 {
@@ -81,6 +82,7 @@ namespace TestProjectAuthoAPI
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = true;
             });
+            builder.Services.AddSingleton<IOtpService, OtpService>();
 
             //Add Authentication
             builder.Services.AddAuthentication(options =>

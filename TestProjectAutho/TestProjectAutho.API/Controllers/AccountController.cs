@@ -54,5 +54,86 @@ namespace TestProjectAuthoAPI.Controllers
         //    return Ok("Password has been reset successfully.");
 
         //}
+        //public class ForgotPasswordRequest
+        //{
+        //    public string Email { get; set; }
+        //}
+
+        //public class ResetPasswordWithOtpRequest
+        //{
+        //    public string Email { get; set; }
+        //    public string Otp { get; set; }
+        //    public string NewPassword { get; set; }
+        //}
+        //public interface IOtpService
+        //{
+        //    void SaveOtp(string email, string otp);
+        //    string GetOtp(string email);
+        //    void RemoveOtp(string email);
+        //}
+
+        //public class OtpService : IOtpService
+        //{
+        //    private readonly Dictionary<string, (string Otp, DateTime Expiry)> _otpStore = new();
+
+        //    public void SaveOtp(string email, string otp)
+        //    {
+        //        _otpStore[email] = (otp, DateTime.UtcNow.AddMinutes(5)); // expires in 5 min
+        //    }
+
+        //    public string GetOtp(string email)
+        //    {
+        //        if (_otpStore.ContainsKey(email))
+        //        {
+        //            var (otp, expiry) = _otpStore[email];
+        //            if (DateTime.UtcNow <= expiry)
+        //                return otp;
+        //        }
+        //        return null;
+        //    }
+
+        //    public void RemoveOtp(string email)
+        //    {
+        //        _otpStore.Remove(email);
+        //    }
+        //}
+
+           // [HttpPost("forgot-password")]
+        //public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest model)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(model.Email);
+        //    if (user == null)
+        //        return BadRequest("User not found");
+
+        //    var otp = new Random().Next(100000, 999999).ToString();
+        //    _otpService.SaveOtp(model.Email, otp);
+
+        //    var emailBody = $"<p>Your OTP for password reset is: <strong>{otp}</strong></p>";
+        //    await _emailService.SendEmailAsync(model.Email, "Password Reset OTP", emailBody);
+
+        //    return Ok("OTP sent to your email.");
+        //}
+
+        //[HttpPost("reset-password")]
+        //public async Task<IActionResult> ResetPasswordWithOtp(ResetPasswordWithOtpRequest model)
+    //    {
+    //        var user = await _userManager.FindByEmailAsync(model.Email);
+    //        if (user == null)
+    //            return BadRequest("User not found");
+
+    //        var savedOtp = _otpService.GetOtp(model.Email);
+    //        if (savedOtp == null || savedOtp != model.Otp)
+    //            return BadRequest("Invalid or expired OTP");
+
+    //        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+    //        var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+
+    //        if (!result.Succeeded)
+    //            return BadRequest(result.Errors);
+
+    //        _otpService.RemoveOtp(model.Email); // clean up
+    //        return Ok("Password reset successful.");
+    //    }
+
     }
 }

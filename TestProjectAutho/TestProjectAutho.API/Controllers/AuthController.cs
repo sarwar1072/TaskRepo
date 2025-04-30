@@ -22,14 +22,16 @@ namespace TestProjectAuthoAPI.Controllers
         private readonly RoleManager<Role> _roleManager;
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
+        private readonly IOtpService _otpService;
         public AuthController(UserManager<ApplicationUser> userManager, RoleManager<Role> roleManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService,
-            IEmailService emailService)
+            IEmailService emailService, IOtpService otpService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
-            _emailService = emailService;   
+            _emailService = emailService;
+            _otpService = otpService;
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterVM registerVm)
@@ -123,44 +125,75 @@ namespace TestProjectAuthoAPI.Controllers
         //    return result.Succeeded ? Ok("Password changed") : BadRequest(result.Errors);
         //}
 
-        [HttpPost("for-Pass")]
-        public async Task<IActionResult> forPass(ForgotPasswordRequest model)
+        //[HttpPost("for-Pass")]
+        //public async Task<IActionResult> forPass(ForgotPasswordRequest model)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(model.Email);
+        //    if (user == null)
+        //        return BadRequest("User not found.");
+
+        //    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        //    var resetLink = Url.Action(nameof(ResPass),"Auth", new { token, email = model.Email }, Request.Scheme);
+
+        //    var emailBody = $"<h3>Reset your password</h3><p>Click the link below to reset your password:</p><a href='{resetLink}'>Reset Password</a>";
+
+        //    await _emailService.SendEmailAsync(model.Email, "Reset Password", emailBody);
+
+        //    return Ok("Password reset link has been sent to your email.");
+        //}
+        //[HttpPost("res-Pass")]
+        //public async Task<IActionResult> ResPass(ResetPasswordRequest model)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(model.Email);
+        //    if (user == null)
+        //        return BadRequest("User not found.");
+
+        //    var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+
+        //    if (!result.Succeeded)
+        //    {
+        //        var errors = result.Errors.Select(e => e.Description);
+        //        return BadRequest(new { Errors = errors });
+        //    }
+        //    return Ok("Password has been reset successfully.");
+        //}
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return BadRequest("User not found.");
+                return BadRequest("User not found");
+
+            var otp = new Random().Next(100000, 999999).ToString();
+            _otpService.SaveOtp(model.Email, otp);
+
+            var emailBody = $"<p>Your OTP for password reset is: <strong>{otp}</strong></p>";
+            await _emailService.SendEmailAsync(model.Email, "Password Reset OTP", emailBody);
+
+            return Ok("OTP sent to your email.");
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPasswordWithOtp(ResetPasswordWithOtpRequest model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return BadRequest("User not found");
+
+            var savedOtp = _otpService.GetOtp(model.Email);
+            if (savedOtp == null || savedOtp != model.Otp)
+                return BadRequest("Invalid or expired OTP");
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            //var encryptToken = EncryptionHelper.Encrypt(token);
-            var resetLink = Url.Action(nameof(ResPass),"Auth", new { token, email = model.Email }, Request.Scheme);
-
-            var emailBody = $"<h3>Reset your password</h3><p>Click the link below to reset your password:</p><a href='{resetLink}'>Reset Password</a>";
-
-            await _emailService.SendEmailAsync(model.Email, "Reset Password", emailBody);
-
-            return Ok("Password reset link has been sent to your email.");
-        }
-        [HttpPost("res-Pass")]
-        public async Task<IActionResult> ResPass(ResetPasswordRequest model)
-        {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-                return BadRequest("User not found.");
-
-            //var decryptToken=EncryptionHelper.Decrypt(model.Token);
-
-            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
 
             if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(e => e.Description);
-                return BadRequest(new { Errors = errors });
-            }
+                return BadRequest(result.Errors);
 
-            return Ok("Password has been reset successfully.");
+            _otpService.RemoveOtp(model.Email); // clean up
+            return Ok("Password reset successful.");
         }
-
         private async Task<AuthResultVM> GenerateJWTTokenAsync(ApplicationUser user)
         {
             var tokenObj = await _tokenService.GetJwtTokenAsync(user);
